@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">POSTer</string>
+    <string name="editor_url_hint">POST URL</string>
+    <string name="editor_parameter_hint">POST Parameter</string>
+    <string name="editor_url_error">POST URL required!</string>
+    <string name="editor_parameter_error">POST parameter required!</string>
+</resources>
