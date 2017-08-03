@@ -21,11 +21,13 @@ public class POSTerCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        // Find fields to populate in inflated template
-        TextView text = (TextView) view.findViewById(R.id.text);
-        // Extract properties from cursor
+        TextView textView = (TextView) view.findViewById(R.id.text);
+        String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
         String url = cursor.getString(cursor.getColumnIndexOrThrow("url"));
-        // Populate fields with extracted properties
-        text.setText(url);
+        if(name != null && !name.isEmpty()) {
+            textView.setText(name);
+        } else {
+            textView.setText(url);
+        }
     }
 }

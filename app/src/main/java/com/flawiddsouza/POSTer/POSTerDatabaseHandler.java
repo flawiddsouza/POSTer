@@ -19,8 +19,10 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "POSTer";
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_ENTRIES = "entries";
+    private static final String KEY_ENTRY_NAME = "name";
     private static final String KEY_ENTRY_URL = "url";
     private static final String KEY_ENTRY_PARAMETER = "parameter";
+    private static final String KEY_ENTRY_STATIC_PARAMETERS = "static_parameters";
 
     public static synchronized POSTerDatabaseHandler getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -50,7 +52,7 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            db.execSQL("CREATE TABLE entries ( _id INTEGER PRIMARY KEY, url TEXT NOT NULL, parameter TEXT NOT NULL );");
+            db.execSQL("CREATE TABLE entries ( _id INTEGER PRIMARY KEY, name TEXT, url TEXT NOT NULL, parameter TEXT NOT NULL, static_parameters TEXT );");
             db.setTransactionSuccessful();
         }
         finally {
@@ -73,8 +75,14 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
             db.beginTransaction();
             try {
                 ContentValues values = new ContentValues();
+                if(!entry.name.isEmpty()) {
+                    values.put(KEY_ENTRY_NAME, entry.name);
+                }
                 values.put(KEY_ENTRY_URL, entry.url);
-                values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                    values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                if(!entry.staticParameters.isEmpty()) {
+                    values.put(KEY_ENTRY_STATIC_PARAMETERS, entry.staticParameters);
+                }
                 db.insertOrThrow(TABLE_ENTRIES, null, values);
                 db.setTransactionSuccessful();
             } catch (Exception e) {
@@ -93,8 +101,10 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
             Cursor cursor = db.rawQuery("SELECT * FROM entries WHERE _id=?", new String[]{Long.toString(id)});
             if(cursor.getCount() == 1) {
                 cursor.moveToFirst(); // select first row
+                entry.name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_NAME));
                 entry.url = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_URL));
                 entry.parameter = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_PARAMETER));
+                entry.staticParameters = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_STATIC_PARAMETERS));
             }
         } catch (Exception e) {
             Log.e("cursor error", e.getLocalizedMessage());
@@ -108,8 +118,10 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
             db.beginTransaction();
             try {
                 ContentValues values = new ContentValues();
+                values.put(KEY_ENTRY_NAME, entry.name);
                 values.put(KEY_ENTRY_URL, entry.url);
                 values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                values.put(KEY_ENTRY_STATIC_PARAMETERS, entry.staticParameters);
                 db.update(TABLE_ENTRIES, values, "_id=?", new String[] { Long.toString(id) });
                 db.setTransactionSuccessful();
             } catch (Exception e) {
