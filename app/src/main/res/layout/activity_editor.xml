@@ -32,6 +32,14 @@
         android:gravity="top"
         android:hint="@string/editor_parameter_hint" />
 
+    <CheckBox
+        android:id="@+id/appendHeading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:checked="true"
+        android:hint="@string/editor_append_heading_hint" />
+
     <EditText
         android:id="@+id/staticParameters"
         android:layout_width="match_parent"

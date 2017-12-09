@@ -3,6 +3,7 @@ package com.flawiddsouza.POSTer;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 public class EditorActivity extends AppCompatActivity {
@@ -10,6 +11,7 @@ public class EditorActivity extends AppCompatActivity {
     private EditText editTextName;
     private EditText editTextUrl;
     private EditText editTextParameter;
+    private CheckBox checkBoxAppendHeading;
     private EditText editTextStaticParameters;
     private boolean edit;
     private long id;
@@ -28,6 +30,7 @@ public class EditorActivity extends AppCompatActivity {
         editTextName = (EditText) findViewById(R.id.name);
         editTextUrl = (EditText) findViewById(R.id.url);
         editTextParameter = (EditText) findViewById(R.id.parameter);
+        checkBoxAppendHeading = (CheckBox) findViewById(R.id.appendHeading);
         editTextStaticParameters = (EditText) findViewById(R.id.staticParameters);
 
         handler = POSTerDatabaseHandler.getInstance(this);
@@ -44,6 +47,7 @@ public class EditorActivity extends AppCompatActivity {
             editTextName.setText(entry.name);
             editTextUrl.setText(entry.url);
             editTextParameter.setText(entry.parameter);
+            checkBoxAppendHeading.setChecked(entry.appendHeading);
             editTextStaticParameters.setText(entry.staticParameters);
 
             editTextName.setSelection(editTextName.getText().length()); // Place cursor at the end of text of the first TextBox
@@ -56,6 +60,7 @@ public class EditorActivity extends AppCompatActivity {
         entry.name = editTextName.getText().toString();
         entry.url = editTextUrl.getText().toString();
         entry.parameter = editTextParameter.getText().toString();
+        entry.appendHeading = checkBoxAppendHeading.isChecked();
         entry.staticParameters = editTextStaticParameters.getText().toString();
 
         if(entry.url.isEmpty() && !entry.parameter.isEmpty()) { // if url is empty & parameter isn't
@@ -85,6 +90,7 @@ public class EditorActivity extends AppCompatActivity {
         entry.name = editTextName.getText().toString();
         entry.url = editTextUrl.getText().toString();
         entry.parameter = editTextParameter.getText().toString();
+        entry.appendHeading = checkBoxAppendHeading.isChecked();
         entry.staticParameters = editTextStaticParameters.getText().toString();
 
         if(entry.url.isEmpty() && !entry.parameter.isEmpty()) { // if url is empty & parameter isn't

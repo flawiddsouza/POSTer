@@ -178,13 +178,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleShare(long id, String subject, String body) {
+        Entry entry = handler.getEntry(id);
         String shareString;
-        if(!subject.isEmpty()) {
+        if(!subject.isEmpty() && entry.appendHeading) {
             shareString = subject + '\n' + body;
         } else {
             shareString = body;
         }
-        Entry entry = handler.getEntry(id);
         try {
             post(entry.url, entry.parameter, shareString);
         } catch (IOException | IllegalArgumentException e) {

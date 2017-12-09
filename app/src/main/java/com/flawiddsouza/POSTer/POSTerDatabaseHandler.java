@@ -22,6 +22,7 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_ENTRY_NAME = "name";
     private static final String KEY_ENTRY_URL = "url";
     private static final String KEY_ENTRY_PARAMETER = "parameter";
+    private static final String KEY_APPEND_HEADING = "append_heading";
     private static final String KEY_ENTRY_STATIC_PARAMETERS = "static_parameters";
 
     public static synchronized POSTerDatabaseHandler getInstance(Context context) {
@@ -52,7 +53,7 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            db.execSQL("CREATE TABLE entries ( _id INTEGER PRIMARY KEY, name TEXT, url TEXT NOT NULL, parameter TEXT NOT NULL, static_parameters TEXT );");
+            db.execSQL("CREATE TABLE entries ( _id INTEGER PRIMARY KEY, name TEXT, url TEXT NOT NULL, parameter TEXT NOT NULL, append_heading INTEGER DEFAULT 1, static_parameters TEXT );");
             db.setTransactionSuccessful();
         }
         finally {
@@ -79,7 +80,8 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
                     values.put(KEY_ENTRY_NAME, entry.name);
                 }
                 values.put(KEY_ENTRY_URL, entry.url);
-                    values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                values.put(KEY_APPEND_HEADING, entry.appendHeading);
                 if(!entry.staticParameters.isEmpty()) {
                     values.put(KEY_ENTRY_STATIC_PARAMETERS, entry.staticParameters);
                 }
@@ -104,6 +106,7 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
                 entry.name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_NAME));
                 entry.url = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_URL));
                 entry.parameter = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_PARAMETER));
+                entry.appendHeading = (cursor.getInt(cursor.getColumnIndexOrThrow(KEY_APPEND_HEADING)) == 1);
                 entry.staticParameters = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ENTRY_STATIC_PARAMETERS));
             }
         } catch (Exception e) {
@@ -121,6 +124,7 @@ public class POSTerDatabaseHandler extends SQLiteOpenHelper {
                 values.put(KEY_ENTRY_NAME, entry.name);
                 values.put(KEY_ENTRY_URL, entry.url);
                 values.put(KEY_ENTRY_PARAMETER, entry.parameter);
+                values.put(KEY_APPEND_HEADING, entry.appendHeading);
                 values.put(KEY_ENTRY_STATIC_PARAMETERS, entry.staticParameters);
                 db.update(TABLE_ENTRIES, values, "_id=?", new String[] { Long.toString(id) });
                 db.setTransactionSuccessful();
