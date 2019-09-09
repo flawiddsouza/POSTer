@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import org.json.JSONObject;
+
 public class EditorActivity extends AppCompatActivity {
 
     private EditText editTextName;
@@ -27,11 +29,11 @@ public class EditorActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Add Entry");
 
-        editTextName = (EditText) findViewById(R.id.name);
-        editTextUrl = (EditText) findViewById(R.id.url);
-        editTextParameter = (EditText) findViewById(R.id.parameter);
-        checkBoxAppendHeading = (CheckBox) findViewById(R.id.appendHeading);
-        editTextStaticParameters = (EditText) findViewById(R.id.staticParameters);
+        editTextName = findViewById(R.id.name);
+        editTextUrl = findViewById(R.id.url);
+        editTextParameter = findViewById(R.id.parameter);
+        checkBoxAppendHeading = findViewById(R.id.appendHeading);
+        editTextStaticParameters = findViewById(R.id.staticParameters);
 
         handler = POSTerDatabaseHandler.getInstance(this);
 
@@ -63,6 +65,15 @@ public class EditorActivity extends AppCompatActivity {
         entry.appendHeading = checkBoxAppendHeading.isChecked();
         entry.staticParameters = editTextStaticParameters.getText().toString();
 
+        if(entry.staticParameters.length() > 0) {
+            try {
+                new JSONObject(entry.staticParameters);
+            } catch (Exception e) {
+                editTextStaticParameters.setError("Invalid JSON given for static parameters");
+                return;
+            }
+        }
+
         if(entry.url.isEmpty() && !entry.parameter.isEmpty()) { // if url is empty & parameter isn't
             editTextUrl.setError(getString(R.string.editor_url_error));
         }
@@ -92,6 +103,15 @@ public class EditorActivity extends AppCompatActivity {
         entry.parameter = editTextParameter.getText().toString();
         entry.appendHeading = checkBoxAppendHeading.isChecked();
         entry.staticParameters = editTextStaticParameters.getText().toString();
+
+        if(entry.staticParameters.length() > 0) {
+            try {
+                new JSONObject(entry.staticParameters);
+            } catch (Exception e) {
+                editTextStaticParameters.setError("Invalid JSON given for static parameters");
+                return false;
+            }
+        }
 
         if(entry.url.isEmpty() && !entry.parameter.isEmpty()) { // if url is empty & parameter isn't
             editTextUrl.setError(getString(R.string.editor_url_error));

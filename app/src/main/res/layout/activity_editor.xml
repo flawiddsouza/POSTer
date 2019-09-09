@@ -43,8 +43,7 @@
     <EditText
         android:id="@+id/staticParameters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="194dp"
         android:gravity="top"
-        android:maxLength="3"
         android:hint="@string/editor_static_parameters" />
 </LinearLayout>

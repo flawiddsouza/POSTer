@@ -9,12 +9,17 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -25,6 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -104,12 +110,44 @@ public class MainActivity extends AppCompatActivity {
         return db.rawQuery("SELECT * FROM entries ORDER BY _id DESC", null);
     }
 
-    private void post(String url, String parameter, String value) throws IOException, IllegalArgumentException {
+    private static String bodyToString(final RequestBody request){
+        try {
+            final RequestBody copy = request;
+            final Buffer buffer = new Buffer();
+            copy.writeTo(buffer);
+            return buffer.readUtf8();
+        }
+        catch (final IOException e) {
+            return "did not work";
+        }
+    }
+
+    private void post(String url, String parameter, String value, String jsonToAppend) throws IOException, IllegalArgumentException {
         OkHttpClient client = new OkHttpClient();
 
-        RequestBody formBody = new FormBody.Builder()
-                .add(parameter, value)
-                .build();
+        FormBody.Builder formBodyBuilder = new FormBody.Builder();
+
+        formBodyBuilder.add(parameter, value);
+
+        if(jsonToAppend.length() > 0) {
+            try {
+                JSONObject parsedJSON = new JSONObject(jsonToAppend);
+                parsedJSON.keys().forEachRemaining(key -> {
+                    try {
+                        formBodyBuilder.add(key, parsedJSON.getString(key));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        RequestBody formBody = formBodyBuilder.build();
+
+//        Log.d("DEBUG_POST", bodyToString(formBody));
+
         Request request = new Request.Builder()
                 .url(url)
                 .post(formBody)
@@ -142,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     Entry entry = handler.getEntry(id);
                     try {
-                        post(entry.url, entry.parameter, clipboardText.toString());
+                        post(entry.url, entry.parameter, clipboardText.toString(), entry.staticParameters);
                     } catch (IOException | IllegalArgumentException e) {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -186,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             shareString = body;
         }
         try {
-            post(entry.url, entry.parameter, shareString);
+            post(entry.url, entry.parameter, shareString, entry.staticParameters);
         } catch (IOException | IllegalArgumentException e) {
             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
