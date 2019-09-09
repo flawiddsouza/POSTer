@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView myListView = (ListView) findViewById(R.id.mainListView);
+        ListView myListView = findViewById(R.id.mainListView);
         posterAdapter = new POSTerCursorAdapter(this, createCursor());
         myListView.setAdapter(posterAdapter);
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (action.equals(Intent.ACTION_SEND) && type.equals("text/plain")) {
 
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            FloatingActionButton fab = findViewById(R.id.fab);
             fab.setEnabled(false);
             fab.setVisibility(View.GONE);
 
