@@ -46,4 +46,9 @@
         android:layout_height="194dp"
         android:gravity="top"
         android:hint="@string/editor_static_parameters" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="You can use {{heading}} in static parameters to substitute it with the appended heading when sharing" />
 </LinearLayout>

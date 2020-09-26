@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -122,19 +123,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void post(String url, String parameter, String value, String jsonToAppend) throws IOException, IllegalArgumentException {
+    private void post(String url, String parameter, String heading, String body, Boolean appendHeading, String jsonToAppend) throws IOException, IllegalArgumentException {
         OkHttpClient client = new OkHttpClient();
 
         FormBody.Builder formBodyBuilder = new FormBody.Builder();
-
-        formBodyBuilder.add(parameter, value);
 
         if(jsonToAppend.length() > 0) {
             try {
                 JSONObject parsedJSON = new JSONObject(jsonToAppend);
                 parsedJSON.keys().forEachRemaining(key -> {
                     try {
-                        formBodyBuilder.add(key, parsedJSON.getString(key));
+                        String keyValue = parsedJSON.getString(key);
+                        keyValue = keyValue.replace("{{heading}}", heading != "" ? heading : body);
+                        formBodyBuilder.add(key, keyValue);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -142,11 +143,20 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            formBodyBuilder.add(parameter, body);
+        } else {
+            String shareString;
+            if(!heading.isEmpty() && appendHeading) {
+                shareString = heading + '\n' + body;
+            } else {
+                shareString = body;
+            }
+            formBodyBuilder.add(parameter, shareString);
         }
 
         RequestBody formBody = formBodyBuilder.build();
 
-//        Log.d("DEBUG_POST", bodyToString(formBody));
+//        Log.d("DEBUG_POST - formBody", bodyToString(formBody));
 
         Request request = new Request.Builder()
                 .url(url)
@@ -180,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     Entry entry = handler.getEntry(id);
                     try {
-                        post(entry.url, entry.parameter, clipboardText.toString(), entry.staticParameters);
+                        post(entry.url, entry.parameter, "", clipboardText.toString(), entry.appendHeading, entry.staticParameters);
                     } catch (IOException | IllegalArgumentException e) {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -217,14 +227,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleShare(long id, String subject, String body) {
         Entry entry = handler.getEntry(id);
-        String shareString;
-        if(!subject.isEmpty() && entry.appendHeading) {
-            shareString = subject + '\n' + body;
-        } else {
-            shareString = body;
-        }
+
         try {
-            post(entry.url, entry.parameter, shareString, entry.staticParameters);
+            post(entry.url, entry.parameter, subject, body, entry.appendHeading, entry.staticParameters);
         } catch (IOException | IllegalArgumentException e) {
             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
